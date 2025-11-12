@@ -1,0 +1,107 @@
+import java.util.*;
+
+public class KRSApp {
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        System.out.println("=== Aplikasi Pengisian KRS Mahasiswa ===");
+        Mahasiswa mahasiswa = inputMahasiswa();
+        if (mahasiswa == null) {
+            System.out.println("Data mahasiswa tidak dimasukkan. Keluar.");
+            return;
+        }
+        KRS krs = new KRS(mahasiswa);
+        boolean running = true;
+        while (running) {
+            tampilkanMenu(krs);
+            System.out.print("Pilihan: ");
+            String line = scanner.nextLine().trim();
+            switch (line) {
+                case "1":
+                    tambahMataKuliah(krs);
+                    break;
+                case "2":
+                    tampilkanDaftar(krs);
+                    break;
+                case "3":
+                    krs.cetakKRS();
+                    break;
+                case "4":
+                    System.out.println("Keluar. Terima kasih.");
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid.");
+            }
+        }
+    }
+
+    private static Mahasiswa inputMahasiswa() {
+        System.out.println("-- Input Data Mahasiswa --");
+        System.out.print("NIM : ");
+        String nim = scanner.nextLine().trim();
+        if (nim.isEmpty()) {
+            System.out.println("NIM tidak boleh kosong.");
+            return null;
+        }
+        System.out.print("Nama: ");
+        String nama = scanner.nextLine().trim();
+        if (nama.isEmpty()) {
+            System.out.println("Nama tidak boleh kosong.");
+            return null;
+        }
+        return new Mahasiswa(nim, nama);
+    }
+
+    private static void tampilkanMenu(KRS krs) {
+        System.out.println("\n--- Menu ---");
+        System.out.println("1. Tambah Mata Kuliah");
+        System.out.println("2. Tampilkan Daftar Mata Kuliah & Total SKS");
+        System.out.println("3. Cetak KRS");
+        System.out.println("4. Keluar");
+    }
+
+    private static void tambahMataKuliah(KRS krs) {
+        System.out.println("-- Tambah Mata Kuliah --");
+        System.out.print("Kode: ");
+        String kode = scanner.nextLine().trim();
+        if (kode.isEmpty()) { System.out.println("Kode tidak boleh kosong"); return; }
+        System.out.print("Nama Mata Kuliah: ");
+        String nama = scanner.nextLine().trim();
+        if (nama.isEmpty()) { System.out.println("Nama tidak boleh kosong"); return; }
+        System.out.print("SKS: ");
+        int sks = 0;
+        try {
+            sks = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("SKS harus angka");
+            return;
+        }
+        MataKuliah mk;
+        try {
+            mk = new MataKuliah(kode, nama, sks);
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Error: " + ex.getMessage());
+            return;
+        }
+        boolean ok = krs.tambahMataKuliah(mk);
+        if (ok) System.out.println("Mata kuliah berhasil ditambahkan.");
+    }
+
+    private static void tampilkanDaftar(KRS krs) {
+        List<MataKuliah> list = krs.getDaftarMK();
+        if (list.isEmpty()) {
+            System.out.println("Belum ada mata kuliah.");
+            return;
+        }
+        System.out.println(String.format("%-4s | %-12s | %-30s | %-3s", "No", "Kode", "Nama Mata Kuliah", "SKS"));
+        System.out.println("---------------------------------------------------------------------");
+        int i = 1;
+        for (MataKuliah m : list) {
+            System.out.println(String.format("%-4d | %-12s | %-30s | %3d", i, m.getKode(), m.getNama(), m.getSks()));
+            i++;
+        }
+        System.out.println("---------------------------------------------------------------------");
+        System.out.println("Total SKS: " + krs.getTotalSKS());
+    }
+}
