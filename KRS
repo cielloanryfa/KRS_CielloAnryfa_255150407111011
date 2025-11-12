@@ -1,0 +1,70 @@
+import java.util.*;
+
+public class KRS {
+    private Mahasiswa mahasiswa;
+    private List<MataKuliah> daftarMK;
+    private static final int MAX_SKS = 24;
+
+    public KRS(Mahasiswa mahasiswa) {
+        if (mahasiswa == null) throw new IllegalArgumentException("Mahasiswa tidak boleh null");
+        this.mahasiswa = mahasiswa;
+        this.daftarMK = new ArrayList<>();
+    }
+
+    public boolean tambahMataKuliah(MataKuliah mk) {
+        if (mk == null) return false;
+        int total = getTotalSKS();
+        if (total + mk.getSks() > MAX_SKS) {
+            System.out.println("❌ Error: Penambahan ditolak. Total SKS akan melebihi " + MAX_SKS + " (saat ini: " + total + ")");
+            return false;
+        }
+        // Cek duplicate kode
+        for (MataKuliah m : daftarMK) {
+            if (m.getKode().equalsIgnoreCase(mk.getKode())) {
+                System.out.println("❌ Error: Kode mata kuliah sudah terdaftar: " + mk.getKode());
+                return false;
+            }
+        }
+        daftarMK.add(mk);
+        return true;
+    }
+
+    public List<MataKuliah> getDaftarMK() {
+        return new ArrayList<>(daftarMK);
+    }
+
+    public int getTotalSKS() {
+        int sum = 0;
+        for (MataKuliah m : daftarMK) sum += m.getSks();
+        return sum;
+    }
+
+    public void cetakKRS() {
+        String garis = "".repeat(60);
+        System.out.println("\n" + garis);
+        System.out.println("\tKARTU RENCANA STUDI (KRS)");
+        System.out.println(garis + "\n");
+        System.out.println("NIM : " + mahasiswa.getNim());
+        System.out.println("Nama: " + mahasiswa.getNama());
+        System.out.println();
+        System.out.println(String.format("%-4s | %-12s | %-30s | %-3s", "No", "Kode", "Nama Mata Kuliah", "SKS"));
+        System.out.println("---------------------------------------------------------------------");
+        int i = 1;
+        for (MataKuliah m : daftarMK) {
+            System.out.println(String.format("%-4d | %-12s | %-30s | %3d", i, m.getKode(), m.getNama(), m.getSks()));
+            i++;
+        }
+        System.out.println("---------------------------------------------------------------------");
+        System.out.println(String.format("%-50s Total SKS: %d", "", getTotalSKS()));
+        System.out.println();
+        System.out.println("Tanda Tangan KPS: " + generateTTD());
+        System.out.println(garis + "\n");
+    }
+
+    private String generateTTD() {
+        String s = mahasiswa.getNim() + mahasiswa.getNama();
+        int h = Math.abs(s.hashCode());
+        String hex = Integer.toHexString(h).toUpperCase();
+        return "TTD-" + (hex.length() > 8 ? hex.substring(0,8) : hex);
+    }
+}
