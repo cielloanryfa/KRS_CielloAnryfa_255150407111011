@@ -1,0 +1,24 @@
+public class Mahasiswa {
+    private final String nim;
+    private final String nama;
+
+    public Mahasiswa(String nim, String nama) {
+        if (nim == null || nim.trim().isEmpty()) throw new IllegalArgumentException("NIM tidak boleh kosong");
+        if (nama == null || nama.trim().isEmpty()) throw new IllegalArgumentException("Nama tidak boleh kosong");
+        this.nim = nim.trim();
+        this.nama = nama.trim();
+    }
+
+    public String getNim() {
+        return nim;
+    }
+
+    public String getNama() {
+        return nama;
+    }
+
+    @Override
+    public String toString() {
+        return nim + " - " + nama;
+    }
+}
